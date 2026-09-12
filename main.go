@@ -22,22 +22,16 @@ var queue = make(chan []byte, 256)
 var clients = make(map[*Client]any)
 var clientsMu sync.RWMutex
 
-//export Broadcast
-func Broadcast(data *C.uchar, length C.int) {
-	// fmt.Printf("data %p %d\n", data, length)
-	payload := C.GoBytes(unsafe.Pointer(data), length)
-
-	select {
-	case queue <- payload:
-	default:
-	}
-}
-
 func main() {
 	C.foo()
 	go BroadcastLoop()
 
-	upgrader := websocket.Upgrader{}
+	upgrader := websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			log.Printf("origin: %v", r.Header.Get("origin"))
+			return true
+		},
+	}
 
 	http.HandleFunc("/audio", func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
@@ -46,7 +40,10 @@ func main() {
 			return
 		}
 
-		client := new(Client{conn: conn, send: make(chan []byte, 16)})
+		client := new(Client{
+			conn: conn,
+			send: make(chan []byte, 16),
+		})
 
 		clientsMu.Lock()
 		clients[client] = struct{}{}
@@ -58,6 +55,16 @@ func main() {
 
 	log.Print("start!")
 	log.Fatal(http.ListenAndServe(":37812", nil))
+}
+
+//export Broadcast
+func Broadcast(data *C.uchar, length C.int) {
+	payload := C.GoBytes(unsafe.Pointer(data), length)
+
+	select {
+	case queue <- payload:
+	default:
+	}
 }
 
 func BroadcastLoop() {

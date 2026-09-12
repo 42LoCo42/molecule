@@ -20,6 +20,7 @@
               ./go.mod
               ./go.sum
               ./main.go
+              ./pipewire.c
             ];
           };
 
@@ -34,7 +35,7 @@
           ];
 
           ldflags = [ "-s" ];
-          vendorHash = "";
+          vendorHash = "sha256-0Qxw+MUYVgzgWB8vi3HBYtVXSq/btfh4ZfV/m1chNrA=";
         };
 
         devShells.default = pkgs.mkShell {
@@ -42,7 +43,10 @@
 
           packages = with pkgs; [
             bear
+            caddy
             clang-tools
+            just
+            livekit-cli
             nodejs
             pnpm
             websocat
