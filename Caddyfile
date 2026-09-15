@@ -15,6 +15,6 @@ localhost {
 		reverse_proxy localhost:29325
 	}
 
+	header "Cross-Origin-Embedder-Policy" "credentialless"
 	header "Cross-Origin-Opener-Policy" "same-origin"
-	header "Cross-Origin-Embedder-Policy" "require-corp"
 }

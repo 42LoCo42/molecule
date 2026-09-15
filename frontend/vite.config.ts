@@ -2,8 +2,8 @@ import { defineConfig } from "vite";
 import generateFile from "vite-plugin-generate-file";
 
 const isolationHeaders = {
+	"Cross-Origin-Embedder-Policy": "credentialless",
 	"Cross-Origin-Opener-Policy": "same-origin",
-	"Cross-Origin-Embedder-Policy": "require-corp",
 };
 
 export default defineConfig({
