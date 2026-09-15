@@ -1,0 +1,72 @@
+@import "reset.css";
+
+:root {
+	--white: #ebdbb2;
+	--black: #282828;
+	--gray: #404040;
+	--red: #cc241d;
+	--green: #98971a;
+	--yellow: #d79921;
+
+	color: var(--white);
+	background-color: var(--black);
+	font-family: "IosevkaTerm NF";
+}
+
+body {
+	display: unset !important;
+}
+
+body > * {
+	margin: 8px;
+}
+
+button {
+	background-color: inherit;
+
+	margin: 4px;
+	padding: 4px;
+
+	border: 1px solid;
+
+	color: var(--red);
+	border-color: var(--red);
+
+	transform: translate(0px, 0px);
+	box-shadow: -0px 0px var(--gray);
+
+	transition:
+		transform 0.25s ease,
+		box-shadow 0.25s ease;
+}
+
+button:hover {
+	color: var(--yellow) !important;
+	border-color: var(--yellow) !important;
+
+	transform: translate(8px, 0px);
+	box-shadow: -8px 0px var(--gray);
+
+	transition:
+		transform 0.25s ease,
+		box-shadow 0.25s ease;
+}
+
+button.enabled {
+	color: var(--green);
+	border-color: var(--green);
+
+	transform: translate(8px, 0px);
+	box-shadow: -8px 0px var(--gray);
+
+	transition:
+		transform 0.25s ease,
+		box-shadow 0.25s ease;
+}
+
+#logo {
+	display: inline-block;
+	padding: 32px;
+	background: url("/room/estradiol.svg") center no-repeat;
+	backdrop-filter: blur(4px);
+}
