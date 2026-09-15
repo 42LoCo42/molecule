@@ -43,7 +43,6 @@
 
           packages = with pkgs; [
             bear
-            caddy
             clang-tools
             just
             livekit-cli

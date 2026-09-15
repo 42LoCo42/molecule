@@ -25,11 +25,23 @@ export default defineConfig({
 		]),
 	],
 
-	// server: {
-	// 	headers: isolationHeaders,
-	// },
+	server: {
+		proxy: {
+			"^/(?!room(?:/|$))": {
+				target: "http://localhost:29325",
+				changeOrigin: true,
+				ws: true,
 
-	// preview: {
-	// 	headers: isolationHeaders,
-	// },
+				configure: (proxy) => {
+					proxy.on("proxyRes", (proxyRes) => {
+						for (const [k, v] of Object.entries(isolationHeaders)) {
+							proxyRes.headers[k] = v;
+						}
+					});
+				},
+			},
+		},
+
+		headers: isolationHeaders,
+	},
 });
