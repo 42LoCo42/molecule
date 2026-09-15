@@ -69,6 +69,7 @@
 
           packages = with pkgs; [
             bear
+            caddy
             clang-tools
             gdb
             just

@@ -67,6 +67,6 @@ button.enabled {
 #logo {
 	display: inline-block;
 	padding: 32px;
-	background: url("/room/estradiol.svg") center no-repeat;
+	background: url("estradiol.svg") center no-repeat;
 	backdrop-filter: blur(4px);
 }

@@ -1,3 +1,5 @@
+import processor from "./processor.js?url"
+
 export async function getSystemAudioTrack(): Promise<MediaStreamTrack> {
 	const sampleRate = 48000;
 
@@ -6,7 +8,7 @@ export async function getSystemAudioTrack(): Promise<MediaStreamTrack> {
 		latencyHint: "interactive",
 	});
 
-	await audioContext.audioWorklet.addModule("/room/processor.js");
+	await audioContext.audioWorklet.addModule(processor);
 	await audioContext.resume();
 
 	const samples = new SharedArrayBuffer(

@@ -7,9 +7,7 @@ const isolationHeaders = {
 };
 
 export default defineConfig({
-	base: "/room",
-
-	publicDir: "public",
+	base: "/room/",
 
 	define: {
 		global: "globalThis",
@@ -23,6 +21,28 @@ export default defineConfig({
 				data: {},
 			},
 		]),
+		{
+			name: "redirect-room",
+			configureServer(server) {
+				server.middlewares.use((req, res, next) => {
+					if (!req.originalUrl) {
+						next();
+						return;
+					}
+
+					const url = new URL(req.originalUrl, "http://localhost");
+
+					if (url.pathname === "/room") {
+						res.statusCode = 302;
+						res.setHeader("Location", `/room/${url.search}`);
+						res.end();
+						return;
+					}
+
+					next();
+				});
+			},
+		},
 	],
 
 	server: {
