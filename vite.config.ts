@@ -27,7 +27,7 @@ export default defineConfig({
 
 	server: {
 		proxy: {
-			"^/(?!room(?:/|$))": {
+			"^/(?!room)": {
 				target: "http://localhost:29325",
 				changeOrigin: true,
 				ws: true,
