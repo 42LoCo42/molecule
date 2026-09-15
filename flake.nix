@@ -44,6 +44,7 @@
           packages = with pkgs; [
             bear
             clang-tools
+            gdb
             just
             livekit-cli
             nodejs

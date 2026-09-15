@@ -1,15 +1,32 @@
-#include <assert.h>
-
 void foo(void);
 
 #if __INCLUDE_LEVEL__ == 0
 
 #include <err.h>
+#include <pthread.h>
 
 #include <pipewire/pipewire.h>
 #include <spa/param/audio/format-utils.h>
 
 void Broadcast(char* data, uint32_t length);
+
+static pthread_barrier_t barrier;
+static int               targetNode = -1;
+
+void on_registry_event(
+	void* data, uint32_t id, uint32_t permissions, const char* type,
+	uint32_t version, const struct spa_dict* props
+) {
+	const char* mediaClass = NULL;
+
+	if(targetNode == -1 &&                                          //
+	   strcmp(type, PW_TYPE_INTERFACE_Node) == 0 &&                 //
+	   (mediaClass = spa_dict_lookup(props, PW_KEY_MEDIA_CLASS)) && //
+	   strcmp(mediaClass, "Audio/Sink") == 0) {
+		targetNode = id;
+		pthread_barrier_wait(&barrier);
+	}
+}
 
 void on_state(
 	void* data, enum pw_stream_state old, enum pw_stream_state state,
@@ -34,6 +51,8 @@ void on_data(void* arg) {
 }
 
 void foo(void) {
+	pthread_barrier_init(&barrier, NULL, 2);
+
 	pw_init(NULL, NULL);
 
 	struct pw_thread_loop* thread_loop = pw_thread_loop_new("pipewire", NULL);
@@ -41,9 +60,40 @@ void foo(void) {
 	struct pw_context*     context     = pw_context_new(main_loop, NULL, 0);
 	struct pw_core*        core        = pw_context_connect(context, NULL, 0);
 
+	////////////////////////////////////////////////////////////////////////////////
+
+	struct pw_registry* registry =
+		pw_core_get_registry(core, PW_VERSION_REGISTRY, 0);
+
+	static struct spa_hook registry_listener = {0};
+
+	static struct pw_registry_events registry_events = {
+		.version = PW_VERSION_REGISTRY_EVENTS,
+		.global  = on_registry_event,
+	};
+
+	pw_registry_add_listener(
+		registry, &registry_listener, &registry_events, NULL
+	);
+
+	////////////////////////////////////////////////////////////////////////////
+
+	pw_thread_loop_start(thread_loop);
+
+	puts("waiting for an Audio/Sink node to appear...");
+	pthread_barrier_wait(&barrier);
+	printf("got node %d\n", targetNode);
+
+	////////////////////////////////////////////////////////////////////////////
+
+	pw_thread_loop_lock(thread_loop);
+
+	char node[128] = {0};
+	snprintf(node, sizeof(node), "%d", targetNode);
+
 	struct pw_properties* props = pw_properties_new(
 		PW_KEY_MEDIA_TYPE, "Audio", //
-		NULL
+		PW_KEY_TARGET_OBJECT, node, NULL
 	);
 
 	struct pw_stream* stream = pw_stream_new(core, "molecule", props);
@@ -83,7 +133,7 @@ void foo(void) {
 		params, 1
 	);
 
-	pw_thread_loop_start(thread_loop);
+	pw_thread_loop_unlock(thread_loop);
 }
 
 #endif
@@ -94,5 +144,7 @@ int main(void) {
 	foo();
 	pause();
 }
+
+void Broadcast(char*, uint32_t) {}
 
 #endif
