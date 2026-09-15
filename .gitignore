@@ -1,8 +1,8 @@
-/.cache
-/.direnv
-/.env
-/compile_commands.json
-/dist
-/node_modules
-/result
-/ca.key
+.cache
+.direnv
+.env
+ca.key
+compile_commands.json
+dist
+node_modules
+result

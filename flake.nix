@@ -3,39 +3,65 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        inherit (pkgs.lib.fileset) toSource unions;
+
+        pname = "molecule";
+        version = "0.0.1";
 
         env = {
           CGO_CFLAGS_ALLOW = "-fno-strict-overflow";
         };
       in
       rec {
-        packages.default = pkgs.buildGoModule {
-          pname = "molecule";
-          version = "1";
+        packages = rec {
+          default = pkgs.linkFarmFromDrvs pname [ frontend backend ];
 
-          src = toSource {
-            root = ./.;
-            fileset = unions [
-              ./go.mod
-              ./go.sum
-              ./main.go
-              ./pipewire.c
+          frontend = pkgs.stdenv.mkDerivation (drv: {
+            pname = "molecule-frontend";
+            inherit version;
+
+            src = ./frontend;
+
+            nativeBuildInputs = with pkgs; [
+              nodejs
+              pnpm
+              pnpmConfigHook
             ];
+
+            pnpmDeps = pkgs.fetchPnpmDeps {
+              inherit (drv) pname src version;
+              inherit (pkgs) pnpm;
+              fetcherVersion = 4;
+              hash = "sha256-oqtCIw3YWGXp92pS6LeYRgxOiogwmXOh3RP62QfNcFc=";
+            };
+
+            buildPhase = ''
+              pnpm vite build
+            '';
+
+            installPhase = ''
+              cp -r dist $out
+            '';
+          });
+
+          backend = pkgs.buildGoModule {
+            pname = "${pname}-backend";
+            inherit version;
+
+            src = ./backend;
+
+            inherit env;
+
+            nativeBuildInputs = with pkgs; [
+              pkg-config
+            ];
+
+            buildInputs = with pkgs; [
+              pipewire
+            ];
+
+            ldflags = [ "-s" ];
+            vendorHash = "sha256-0Qxw+MUYVgzgWB8vi3HBYtVXSq/btfh4ZfV/m1chNrA=";
           };
-
-          inherit env;
-
-          nativeBuildInputs = with pkgs; [
-            pkg-config
-          ];
-
-          buildInputs = with pkgs; [
-            pipewire
-          ];
-
-          ldflags = [ "-s" ];
-          vendorHash = "sha256-0Qxw+MUYVgzgWB8vi3HBYtVXSq/btfh4ZfV/m1chNrA=";
         };
 
         devShells.default = pkgs.mkShell {
