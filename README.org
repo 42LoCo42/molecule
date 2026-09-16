@@ -1,0 +1,24 @@
+* Molecule
+A featureful [[https://github.com/element-hq/element-call][element-call]] replacement, with such amazing 22nd century
+improvements as *SYSTEM AUDIO SHARING*!!!
+
+[[file:showcase.png]]
+
+** How it works
+Apart from the normal MatrixRTC + Livekit stuff, Molecule also connects
+to a daemon that records system audio from Pipewire.
+Very soon™, this daemon will provide audio source selection functionality
+similar to [[https://github.com/42LoCo42/gstalk][gstalk]] via a separate control protocol driven by the frontend.
+
+** Usage guide
+1. Have [[https://github.com/gomuks/gomuks][Gomuks Web]] running locally (on its standard port 29325)
+2. Clone this repo & run =direnv allow= to get into the Nix devshell
+3. Run =just frontend= & =just backend= separately
+4. Access Gomuks through [[http://localhost:5173]]
+5. Set your Element call base URL to that same address
+6. Place a call; you should see Molecule starting!
+
+** Why does Molecule need the same origin as Gomuks?
+[[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements][This is why,]] and we need SharedArrayBuffer for low-latency audio transport.
+
+Don't ask me, I didn't make the rules ¯\_(ツ)_/¯
