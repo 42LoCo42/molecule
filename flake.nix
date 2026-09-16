@@ -10,6 +10,10 @@
         env = {
           CGO_CFLAGS_ALLOW = "-fno-strict-overflow";
         };
+
+        python = pkgs.python3.withPackages (p: with p; [
+          fonttools
+        ]);
       in
       rec {
         packages = rec {
@@ -75,10 +79,14 @@
             helvum
             just
             livekit-cli
+            python
             websocat
+            woff2
           ];
 
-          inherit env;
+          env = env // {
+            IOSEVKA = "${pkgs.iosevka}/share/fonts/truetype/Iosevka-Regular.ttf";
+          };
         };
       });
 }

@@ -10,3 +10,10 @@ backend:
 listen:
 	websocat -b ws://localhost:37812/audio \
 	| pw-play --raw --format f32 --rate 48000 -
+
+font:
+	./frontend/subset.py $IOSEVKA frontend/iosevka.ttf
+	woff2_compress frontend/iosevka.ttf
+
+dist:
+	./frontend/build.sh

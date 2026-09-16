@@ -1,5 +1,15 @@
 @import "reset.css";
 
+@font-face {
+	font-family: "Iosevka";
+	font-style: normal;
+	font-weight: 400;
+	font-stretch: normal;
+	src:
+		url("iosevka.woff2") format("woff2"),
+		url("iosevka.ttf") format("truetype");
+}
+
 :root {
 	--white: #ebdbb2;
 	--black: #282828;
@@ -10,7 +20,7 @@
 
 	color: var(--white);
 	background-color: var(--black);
-	font-family: "IosevkaTerm NF";
+	font-family: "Iosevka", "monospace";
 }
 
 body {
