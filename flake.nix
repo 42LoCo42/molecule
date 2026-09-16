@@ -35,16 +35,7 @@
             };
 
             buildPhase = ''
-              pnpm vite build
-
-              (
-                cd dist/assets
-                rm -v           \
-                  *.{mp3,ogg}   \
-                  Logo-*        \
-                  matrix_sdk_*  \
-                  rust-crypto-*
-              )
+              ./build.sh
             '';
 
             installPhase = ''
@@ -81,10 +72,9 @@
             caddy
             clang-tools
             gdb
+            helvum
             just
             livekit-cli
-            nodejs
-            pnpm
             websocat
           ];
 
