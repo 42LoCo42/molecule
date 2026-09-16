@@ -17,3 +17,12 @@ font:
 
 dist:
 	./frontend/build.sh
+
+backend-test:
+	#!/usr/bin/env bash
+	tmp="$(mktemp -d)"
+	cc                                                \
+		-std=c23 -Wall -Wextra                        \
+		$(pkg-config --cflags --libs libpipewire-0.3) \
+		backend/pipewire.c -o "$tmp/molecule"
+	"$tmp/molecule"

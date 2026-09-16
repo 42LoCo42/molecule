@@ -1,5 +1,6 @@
 package main
 
+// #cgo CFLAGS: -std=c23 -DCGO -Wall -Wextra
 // #cgo pkg-config: libpipewire-0.3
 // #include "pipewire.c"
 import "C"
@@ -23,7 +24,7 @@ var clients = make(map[*Client]any)
 var clientsMu sync.RWMutex
 
 func main() {
-	C.foo()
+	C.initAudioCapture()
 	go BroadcastLoop()
 
 	upgrader := websocket.Upgrader{
@@ -47,6 +48,7 @@ func main() {
 
 		clientsMu.Lock()
 		clients[client] = struct{}{}
+		C.setAudioCaptureState(true)
 		clientsMu.Unlock()
 
 		go client.WriteLoop()
@@ -111,6 +113,7 @@ func (c *Client) Remove() {
 		delete(clients, c)
 		close(c.send)
 		c.conn.Close()
+		C.setAudioCaptureState(len(clients) > 0)
 	}
 
 	clientsMu.Unlock()

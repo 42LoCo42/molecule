@@ -1,4 +1,13 @@
-void foo(void);
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200112L
+#endif
+
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif
+
+void initAudioCapture(void);
+void setAudioCaptureState(bool state);
 
 #if __INCLUDE_LEVEL__ == 0
 
@@ -10,12 +19,14 @@ void foo(void);
 
 void Broadcast(char* data, uint32_t length);
 
-static pthread_barrier_t barrier;
-static int               targetNode = -1;
+static pthread_barrier_t      barrier;
+static int                    targetNode = -1;
+static struct pw_thread_loop* thread_loop;
+static struct pw_stream*      stream;
 
-void on_registry_event(
-	void* data, uint32_t id, uint32_t permissions, const char* type,
-	uint32_t version, const struct spa_dict* props
+static void on_registry_event(
+	void*, uint32_t id, uint32_t, const char* type, uint32_t,
+	const struct spa_dict* props
 ) {
 	const char* mediaClass = NULL;
 
@@ -28,14 +39,33 @@ void on_registry_event(
 	}
 }
 
-void on_state(
-	void* data, enum pw_stream_state old, enum pw_stream_state state,
-	const char* error
-) {
-	printf("state %d -> %d (%s)\n", old, state, error);
+static const char* streamStateShow(enum pw_stream_state state) {
+	switch(state) {
+	case PW_STREAM_STATE_ERROR:
+		return "error";
+	case PW_STREAM_STATE_UNCONNECTED:
+		return "unconnected";
+	case PW_STREAM_STATE_CONNECTING:
+		return "connecting";
+	case PW_STREAM_STATE_PAUSED:
+		return "paused";
+	case PW_STREAM_STATE_STREAMING:
+		return "streaming";
+	}
+
+	return "invalid";
 }
 
-void on_data(void* arg) {
+static void on_state(
+	void*, enum pw_stream_state old, enum pw_stream_state new, const char* error
+) {
+	printf(
+		"state %s -> %s (%s)\n", streamStateShow(old), streamStateShow(new),
+		error
+	);
+}
+
+static void on_data(void* arg) {
 	struct pw_stream* stream = arg;
 
 	struct pw_buffer* buffer = pw_stream_dequeue_buffer(stream);
@@ -50,15 +80,15 @@ void on_data(void* arg) {
 	pw_stream_queue_buffer(stream, buffer);
 }
 
-void foo(void) {
+void initAudioCapture(void) {
 	pthread_barrier_init(&barrier, NULL, 2);
 
 	pw_init(NULL, NULL);
 
-	struct pw_thread_loop* thread_loop = pw_thread_loop_new("pipewire", NULL);
-	struct pw_loop*        main_loop   = pw_thread_loop_get_loop(thread_loop);
-	struct pw_context*     context     = pw_context_new(main_loop, NULL, 0);
-	struct pw_core*        core        = pw_context_connect(context, NULL, 0);
+	thread_loop                  = pw_thread_loop_new("pipewire", NULL);
+	struct pw_loop*    main_loop = pw_thread_loop_get_loop(thread_loop);
+	struct pw_context* context   = pw_context_new(main_loop, NULL, 0);
+	struct pw_core*    core      = pw_context_connect(context, NULL, 0);
 
 	////////////////////////////////////////////////////////////////////////////////
 
@@ -96,7 +126,7 @@ void foo(void) {
 		PW_KEY_TARGET_OBJECT, node, NULL
 	);
 
-	struct pw_stream* stream = pw_stream_new(core, "molecule", props);
+	stream = pw_stream_new(core, "molecule", props);
 
 	static struct spa_hook         listener = {0};
 	static struct pw_stream_events events   = {
@@ -133,18 +163,34 @@ void foo(void) {
 		params, 1
 	);
 
+	pw_stream_set_active(stream, false);
+	pw_thread_loop_unlock(thread_loop);
+}
+
+void setAudioCaptureState(bool state) {
+	pw_thread_loop_lock(thread_loop);
+	pw_stream_set_active(stream, state);
 	pw_thread_loop_unlock(thread_loop);
 }
 
 #endif
 
-#ifdef TEST
+#ifndef CGO
 
 int main(void) {
-	foo();
-	pause();
+	initAudioCapture();
+
+	bool state = false;
+	for(;;) {
+		getchar();
+		state ^= true;
+		printf("enabled %d\n", state);
+		setAudioCaptureState(state);
+	}
 }
 
-void Broadcast(char*, uint32_t) {}
+void Broadcast(char*, uint32_t len) {
+	printf("got data %u\n", len);
+}
 
 #endif
