@@ -36,6 +36,15 @@
 
             buildPhase = ''
               pnpm vite build
+
+              (
+                cd dist/assets
+                rm -v           \
+                  *.{mp3,ogg}   \
+                  Logo-*        \
+                  matrix_sdk_*  \
+                  rust-crypto-*
+              )
             '';
 
             installPhase = ''

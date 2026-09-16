@@ -13,7 +13,7 @@ import { getSFUConfigWithOpenID } from "element-call/src/livekit/openIDSFU.ts";
 import { getUrlParams } from "element-call/src/UrlParams.ts";
 import { initializeWidget } from "element-call/src/widget.ts";
 
-import { getSystemAudioTrack } from "./system-audio";
+import { getSystemAudioTrack, testSystemAudioSocket } from "./system-audio";
 
 function sleep(ms: number): Promise<unknown> {
 	return new Promise((resolve) => setTimeout(resolve, ms));
@@ -210,27 +210,36 @@ window.onload = async () => {
 			setBtnState(screenBtn, active, "Share screen", "Stop sharing screen");
 		};
 
-		let systemAudioTrack: undefined | LocalTrack = undefined;
 		const sysaudBtn = document.getElementById("sysaud") as HTMLButtonElement;
-		sysaudBtn.onclick = async () => {
-			if (systemAudioTrack === undefined) {
-				systemAudioTrack = (
-					await me.publishTrack(await getSystemAudioTrack(), {
-						source: Track.Source.ScreenShareAudio,
-					})
-				).track;
-			} else {
-				await me.unpublishTrack(systemAudioTrack);
-				systemAudioTrack = undefined;
-			}
+		if (typeof SharedArrayBuffer === "undefined") {
+			sysaudBtn.disabled = true;
+			sysaudBtn.title = "SharedArrayBuffer is undefined, check your URLs!";
+		} else if (!(await testSystemAudioSocket())) {
+			sysaudBtn.disabled = true;
+			sysaudBtn.title = "Can't connect to molecule daemon!";
+		} else {
+			let systemAudioTrack: undefined | LocalTrack = undefined;
 
-			setBtnState(
-				sysaudBtn,
-				systemAudioTrack !== undefined,
-				"Share system audio",
-				"Stop sharing system audio",
-			);
-		};
+			sysaudBtn.onclick = async () => {
+				if (systemAudioTrack === undefined) {
+					systemAudioTrack = (
+						await me.publishTrack(await getSystemAudioTrack(), {
+							source: Track.Source.ScreenShareAudio,
+						})
+					).track;
+				} else {
+					await me.unpublishTrack(systemAudioTrack);
+					systemAudioTrack = undefined;
+				}
+
+				setBtnState(
+					sysaudBtn,
+					systemAudioTrack !== undefined,
+					"Share system audio",
+					"Stop sharing system audio",
+				);
+			};
+		}
 
 		boot("done");
 		await sleep(250);
@@ -242,7 +251,9 @@ window.onload = async () => {
 
 		const buttons = document.getElementById("buttons") as HTMLDivElement;
 		buttons.style.removeProperty("display");
-	} catch {
+	} catch (e) {
+		console.error(e);
+
 		status.textContent = "oopsie woopsie!";
 
 		if (checkbox !== null) {

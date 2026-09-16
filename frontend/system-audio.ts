@@ -1,4 +1,21 @@
-import processor from "./processor.js?url"
+import processor from "./processor.js?url";
+
+const audioURL = "ws://localhost:37812/audio";
+
+export async function testSystemAudioSocket(): Promise<boolean> {
+	return new Promise((resolve) => {
+		const socket = new WebSocket(audioURL);
+
+		socket.onopen = () => {
+			socket.close();
+			resolve(true);
+		};
+
+		socket.onerror = () => {
+			resolve(false);
+		};
+	});
+}
 
 export async function getSystemAudioTrack(): Promise<MediaStreamTrack> {
 	const sampleRate = 48000;
@@ -33,7 +50,7 @@ export async function getSystemAudioTrack(): Promise<MediaStreamTrack> {
 	const destination = audioContext.createMediaStreamDestination();
 	player.connect(destination);
 
-	const socket = new WebSocket("ws://localhost:37812/audio");
+	const socket = new WebSocket(audioURL);
 	socket.binaryType = "arraybuffer";
 
 	socket.onmessage = async (event) => {
