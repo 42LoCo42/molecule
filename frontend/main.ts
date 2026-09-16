@@ -1,7 +1,13 @@
 import E2EEWorker from "livekit-client/e2ee-worker?worker&inline";
 import { v4 as uuidv4 } from "uuid";
 import { isLivekitTransportConfig } from "matrix-js-sdk/lib/matrixrtc/LivekitTransport.js";
-import { LocalTrack, Room, RoomEvent, Track } from "livekit-client";
+import {
+	AudioPresets,
+	LocalTrack,
+	Room,
+	RoomEvent,
+	Track,
+} from "livekit-client";
 
 import {
 	DEFAULT_CONFIG,
@@ -122,6 +128,8 @@ window.onload = async () => {
 			audioCaptureDefaults: {
 				echoCancellation: false,
 				noiseSuppression: false,
+				voiceIsolation: false,
+				channelCount: 2,
 			},
 
 			e2ee: {
@@ -189,7 +197,10 @@ window.onload = async () => {
 		const micBtn = document.getElementById("mic") as HTMLButtonElement;
 		micBtn.onclick = async () => {
 			const active = !me.isMicrophoneEnabled;
-			await me.setMicrophoneEnabled(active);
+			await me.setMicrophoneEnabled(active, undefined, {
+				forceStereo: true,
+				audioPreset: AudioPresets.musicHighQualityStereo,
+			});
 
 			setBtnState(micBtn, active, "Unmute", "Mute");
 		};
@@ -225,6 +236,8 @@ window.onload = async () => {
 					systemAudioTrack = (
 						await me.publishTrack(await getSystemAudioTrack(), {
 							source: Track.Source.ScreenShareAudio,
+							forceStereo: true,
+							audioPreset: AudioPresets.musicHighQualityStereo,
 						})
 					).track;
 				} else {
