@@ -177,6 +177,9 @@ window.onload = async () => {
 			{ matrixRTCMode },
 		);
 
+		await boot("userMedia");
+		await navigator.mediaDevices.getUserMedia({ audio: true });
+
 		await boot("connect");
 		await lkRoom.setE2EEEnabled(true);
 		await lkRoom.connect(lkCreds.url, lkCreds.jwt);
