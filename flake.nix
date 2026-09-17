@@ -80,6 +80,7 @@
             just
             livekit-cli
             python
+            valgrind
             websocat
             woff2
           ];

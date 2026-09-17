@@ -27,15 +27,21 @@
 			<div id="connect">[ <x-tick>&nbsp;&nbsp;</x-tick> ] connect</div>
 		</div>
 
-		<div id="buttons" style="display: none">
+		<div id="main" hidden="">
 			<div>
 				<button id="leave">Leave</button>
 				<button id="mic">Unmute</button>
 				<button id="cam">Start webcam</button>
 			</div>
+
 			<div>
 				<button id="screen">Share screen</button>
 				<button id="sysaud">Share system audio</button>
+			</div>
+			<br />
+			<div id="systemAudio" hidden="">
+				<button id="systemAudioAuto">Auto add</button>
+				<div id="systemAudioTargets"></div>
 			</div>
 		</div>
 		<br />

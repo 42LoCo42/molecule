@@ -3,7 +3,7 @@
 	skip_install_trust
 }
 
-localhost {
+http://localhost:8080 {
 	@frontend path_regexp ^/room($|/.+)$
 	handle @frontend {
 		uri strip_prefix /room

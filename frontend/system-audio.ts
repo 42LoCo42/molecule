@@ -1,10 +1,50 @@
 import processor from "./processor.js?url";
 
-const audioURL = "ws://localhost:37812/audio";
+const baseURL = "ws://localhost:37812";
+const audioURL = `${baseURL}/audio`;
+const controlURL = `${baseURL}/control`;
 
-export async function testSystemAudioSocket(): Promise<boolean> {
+export class SystemAudio {
+	track!: MediaStreamTrack;
+	audioSocket!: WebSocket;
+	controlSocket!: WebSocket;
+
+	constructor(
+		track: MediaStreamTrack,
+		audioSocket: WebSocket,
+		controlSocket: WebSocket,
+	) {
+		this.track = track;
+		this.audioSocket = audioSocket;
+		this.controlSocket = controlSocket;
+	}
+
+	public setLink(node: number, link: boolean) {
+		const msg: Control = { node, link };
+		this.controlSocket.send(JSON.stringify(msg));
+	}
+}
+
+export class Target {
+	node!: number;
+	name!: string;
+	running!: boolean;
+	linked!: boolean;
+
+	mainEl!: HTMLDivElement;
+	nameEl!: HTMLSpanElement;
+	linkEl!: HTMLInputElement;
+	expire!: boolean;
+}
+
+export class Control {
+	node!: number;
+	link!: boolean;
+}
+
+async function testWebsocket(url: string): Promise<boolean> {
 	return new Promise((resolve) => {
-		const socket = new WebSocket(audioURL);
+		const socket = new WebSocket(url);
 
 		socket.onopen = () => {
 			socket.close();
@@ -17,7 +57,13 @@ export async function testSystemAudioSocket(): Promise<boolean> {
 	});
 }
 
-export async function getSystemAudioTrack(): Promise<MediaStreamTrack> {
+export async function testSystemAudioDaemon(): Promise<boolean> {
+	const audioOK = await testWebsocket(audioURL);
+	const controlOK = await testWebsocket(controlURL);
+	return audioOK && controlOK;
+}
+
+export async function getSystemAudio(): Promise<SystemAudio> {
 	const sampleRate = 48000;
 
 	const audioContext = new AudioContext({
@@ -50,10 +96,10 @@ export async function getSystemAudioTrack(): Promise<MediaStreamTrack> {
 	const destination = audioContext.createMediaStreamDestination();
 	player.connect(destination);
 
-	const socket = new WebSocket(audioURL);
-	socket.binaryType = "arraybuffer";
+	const audioSocket = new WebSocket(audioURL);
+	audioSocket.binaryType = "arraybuffer";
 
-	socket.onmessage = async (event) => {
+	audioSocket.onmessage = async (event) => {
 		const payload = new Float32Array(event.data);
 		const frames = payload.length / 2;
 
@@ -82,5 +128,8 @@ export async function getSystemAudioTrack(): Promise<MediaStreamTrack> {
 	const track = destination.stream.getAudioTracks()[0];
 	if (track === undefined) throw new Error("system audio track is undefined");
 
-	return track;
+	const controlSocket = new WebSocket(controlURL);
+	controlSocket.binaryType = "arraybuffer";
+
+	return new SystemAudio(track, audioSocket, controlSocket);
 }

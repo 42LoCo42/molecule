@@ -19,7 +19,12 @@ import { getSFUConfigWithOpenID } from "element-call/src/livekit/openIDSFU.ts";
 import { getUrlParams } from "element-call/src/UrlParams.ts";
 import { initializeWidget } from "element-call/src/widget.ts";
 
-import { getSystemAudioTrack, testSystemAudioSocket } from "./system-audio";
+import {
+	getSystemAudio,
+	SystemAudio,
+	Target,
+	testSystemAudioDaemon,
+} from "./system-audio";
 
 function sleep(ms: number): Promise<unknown> {
 	return new Promise((resolve) => setTimeout(resolve, ms));
@@ -33,7 +38,7 @@ function setBtnState(
 	btn: HTMLButtonElement,
 	on: boolean,
 	offText: string,
-	onText: string,
+	onText: string = offText,
 ) {
 	btn.textContent = on ? onText : offText;
 
@@ -43,6 +48,8 @@ function setBtnState(
 		btn.classList.remove("enabled");
 	}
 }
+
+const decoder = new TextDecoder();
 
 window.onload = async () => {
 	const status = document.getElementById("status") as HTMLHeadingElement;
@@ -225,35 +232,118 @@ window.onload = async () => {
 		};
 
 		const sysaudBtn = document.getElementById("sysaud") as HTMLButtonElement;
+		const systemAudioSection = document.getElementById(
+			"systemAudio",
+		) as HTMLDivElement;
+		const systemAudioAutoBtn = document.getElementById(
+			"systemAudioAuto",
+		) as HTMLButtonElement;
+		const systemAudioTargets = document.getElementById(
+			"systemAudioTargets",
+		) as HTMLDivElement;
+
 		if (typeof SharedArrayBuffer === "undefined") {
 			sysaudBtn.disabled = true;
 			sysaudBtn.title = "SharedArrayBuffer is undefined, check your URLs!";
-		} else if (!(await testSystemAudioSocket())) {
+		} else if (!(await testSystemAudioDaemon())) {
 			sysaudBtn.disabled = true;
 			sysaudBtn.title = "Can't connect to molecule daemon!";
 		} else {
-			let systemAudioTrack: undefined | LocalTrack = undefined;
+			let systemAudio: SystemAudio;
+			let publication: LocalTrack | undefined;
+			let autoAdd: boolean = false;
+			const targets = new Map<number, Target>();
 
 			sysaudBtn.onclick = async () => {
-				if (systemAudioTrack === undefined) {
-					systemAudioTrack = (
-						await me.publishTrack(await getSystemAudioTrack(), {
+				if (publication === undefined) {
+					systemAudio = await getSystemAudio();
+
+					systemAudio.controlSocket.onmessage = async (event) => {
+						targets.forEach((it) => (it.expire = true));
+
+						const targetList: [Target] = JSON.parse(decoder.decode(event.data));
+						for (const src of targetList) {
+							let dst = targets.get(src.node);
+							if (dst === undefined) {
+								src.mainEl = document.createElement("div");
+
+								src.linkEl = document.createElement("input");
+								src.linkEl.setAttribute("type", "checkbox");
+								src.linkEl.style.setProperty("margin-right", "8px");
+								src.linkEl.checked = src.linked;
+								src.linkEl.onclick = () => {
+									systemAudio.setLink(src.node, src.linkEl.checked);
+								};
+								src.mainEl.appendChild(src.linkEl);
+
+								src.nameEl = document.createElement("span");
+								src.nameEl.textContent = src.name;
+								if (!src.running) src.nameEl.classList.add("paused");
+								src.mainEl.appendChild(src.nameEl);
+
+								systemAudioTargets.appendChild(src.mainEl);
+
+								src.expire = false;
+								targets.set(src.node, src);
+
+								if (autoAdd) {
+									systemAudio.setLink(src.node, true);
+								}
+							} else {
+								dst.nameEl.textContent = src.name;
+								log(src, dst);
+
+								if (src.running) {
+									dst.nameEl.classList.remove("paused");
+								} else {
+									dst.nameEl.classList.add("paused");
+								}
+
+								dst.linkEl.checked = src.linked;
+								dst.expire = false;
+							}
+						}
+
+						targets.forEach((it) => {
+							if (it.expire) {
+								targets.delete(it.node);
+								systemAudioTargets.removeChild(it.mainEl);
+							}
+						});
+
+						log(targets);
+					};
+
+					publication = (
+						await me.publishTrack(systemAudio.track, {
 							source: Track.Source.ScreenShareAudio,
 							forceStereo: true,
 							audioPreset: AudioPresets.musicHighQualityStereo,
 						})
 					).track;
+
+					systemAudioSection.hidden = false;
 				} else {
-					await me.unpublishTrack(systemAudioTrack);
-					systemAudioTrack = undefined;
+					await me.unpublishTrack(publication);
+					publication = undefined;
+
+					systemAudio.audioSocket.close();
+					systemAudio.controlSocket.close();
+
+					systemAudioSection.hidden = true;
 				}
 
 				setBtnState(
 					sysaudBtn,
-					systemAudioTrack !== undefined,
+					publication !== undefined,
 					"Share system audio",
 					"Stop sharing system audio",
 				);
+			};
+
+			systemAudioAutoBtn.onclick = () => {
+				autoAdd = !autoAdd;
+				setBtnState(systemAudioAutoBtn, autoAdd, "Auto add");
 			};
 		}
 
@@ -265,8 +355,11 @@ window.onload = async () => {
 		const loading = document.getElementById("loading") as HTMLDivElement;
 		loading.remove();
 
-		const buttons = document.getElementById("buttons") as HTMLDivElement;
-		buttons.style.removeProperty("display");
+		const main = document.getElementById("main") as HTMLDivElement;
+		main.hidden = false;
+
+		await client.sendEmoteMessage(roomId, "is calling!");
+		micBtn.click();
 	} catch (e) {
 		console.error(e);
 

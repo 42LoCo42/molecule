@@ -81,3 +81,8 @@ button[disabled] {
 	padding: 32px;
 	background: url("estradiol.svg") no-repeat;
 }
+
+.paused {
+	color: #928374;
+	font-style: italic;
+}
