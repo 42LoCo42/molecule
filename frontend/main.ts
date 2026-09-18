@@ -134,8 +134,8 @@ window.onload = async () => {
 
 			audioCaptureDefaults: {
 				echoCancellation: false,
-				noiseSuppression: false,
-				voiceIsolation: false,
+				noiseSuppression: true,
+				voiceIsolation: true,
 				channelCount: 2,
 			},
 
