@@ -14,6 +14,7 @@
 	--white: #ebdbb2;
 	--black: #282828;
 	--gray: #404040;
+	--lgray: #928374;
 	--red: #cc241d;
 	--green: #98971a;
 	--yellow: #d79921;
@@ -35,44 +36,49 @@ button {
 	background-color: inherit;
 
 	margin: 4px;
+	margin-bottom: 6px;
 	padding: 4px;
 
 	border: 1px solid;
 
 	color: var(--red);
-	border-color: var(--red);
+	border-color: var(--gray);
 
 	transition:
-		color 0.25s ease,
-		border-color 0.25s ease,
-		transform 0.25s ease,
-		box-shadow 0.25s ease;
+		color 0.25s ease-out,
+		border-color 0.25s ease-out,
+		transform 0.25s ease-out,
+		box-shadow 0.25s ease-out;
 }
 
 button:not([disabled]):hover {
 	color: var(--yellow);
 	border-color: var(--yellow);
 
-	transform: translate(8px, 0px);
-	box-shadow: -8px 0px var(--gray);
+	transform: translate(3px, 3px);
+	box-shadow: -3px -3px var(--gray);
 
 	transition:
-		color 0.25s ease,
-		border-color 0.25s ease,
-		transform 0.25s ease,
-		box-shadow 0.25s ease;
+		color 0.25s ease-out,
+		border-color 0.25s ease-out,
+		transform 0.25s ease-out,
+		box-shadow 0.25s ease-out;
 }
 
 button.enabled {
-	color: var(--green);
-	border-color: var(--green);
+	color: var(--green) !important;
+	border-color: var(--green) !important;
 
-	transform: translate(8px, 0px);
-	box-shadow: -8px 0px var(--gray);
+	transform: translate(6px, 6px) !important;
+	box-shadow: -6px -6px var(--gray) !important;
+}
+button.enabled:hover {
+	color: var(--yellow) !important;
+	border-color: var(--yellow) !important;
 }
 
 button[disabled] {
-	color: var(--gray);
+	color: var(--lgray);
 	border-color: var(--gray);
 }
 
@@ -83,6 +89,6 @@ button[disabled] {
 }
 
 .paused {
-	color: #928374;
+	color: var(--lgray);
 	font-style: italic;
 }
