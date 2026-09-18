@@ -5,7 +5,7 @@
         pkgs = import nixpkgs { inherit system; };
 
         pname = "molecule";
-        version = "0.0.1";
+        version = "1.0.0";
 
         env = {
           CGO_CFLAGS_ALLOW = "-fno-strict-overflow";
@@ -35,11 +35,11 @@
               inherit (drv) pname src version;
               inherit (pkgs) pnpm;
               fetcherVersion = 4;
-              hash = "sha256-oqtCIw3YWGXp92pS6LeYRgxOiogwmXOh3RP62QfNcFc=";
+              hash = "sha256-0d8DqWw7Jf2okZ2wQB48Ek1thbK5Og5O1bNhtZflqi0=";
             };
 
             buildPhase = ''
-              ./build.sh
+              bash build.sh
             '';
 
             installPhase = ''

@@ -1,4 +1,6 @@
 {
+	"extends": "@tsconfig/svelte/tsconfig.json",
+
 	"compilerOptions": {
 		"module": "es2022",
 		"target": "es2022",
@@ -16,6 +18,8 @@
 		"jsx": "react-jsx",
 		"skipLibCheck": true,
 		"allowImportingTsExtensions": true,
-		"moduleResolution": "bundler"
+		"moduleResolution": "bundler",
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true
 	}
 }

@@ -1,4 +1,5 @@
-import { defineConfig } from "vite";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { defineConfig, searchForWorkspaceRoot } from "vite";
 import generateFile from "vite-plugin-generate-file";
 
 const isolationHeaders = {
@@ -14,6 +15,7 @@ export default defineConfig({
 	},
 
 	plugins: [
+		svelte({}),
 		generateFile([
 			{
 				type: "json",

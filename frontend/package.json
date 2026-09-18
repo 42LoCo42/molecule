@@ -3,6 +3,9 @@
 	"devDependencies": {
 		"@livekit/components-core": "^0.12.15",
 		"@sentry/react": "^10.74.0",
+		"@sveltejs/vite-plugin-svelte": "^7.3.0",
+		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
+		"@tsconfig/svelte": "^5.0.8",
 		"@vector-im/compound-design-tokens": "^11.0.0",
 		"@vector-im/compound-web": "^10.0.1",
 		"classnames": "^2.5.1",
@@ -16,6 +19,7 @@
 		"react": "^19.3.0",
 		"react-i18next": "^17.0.14",
 		"react-router-dom": "^7.18.3",
+		"svelte": "^5.57.0",
 		"uuid": "^14.0.2",
 		"vite": "^8.3.0",
 		"vite-plugin-generate-file": "^0.3.1"

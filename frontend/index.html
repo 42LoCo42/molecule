@@ -3,48 +3,12 @@
 	<head>
 		<meta charset="utf-8" />
 		<link rel="stylesheet" href="style.css" />
-		<script type="module" src="main.ts"></script>
+		<script type="module">
+			import { mount } from "svelte";
+
+			import App from "./App.svelte";
+
+			export default mount(App, { target: document.body });
+		</script>
 	</head>
-	<body style="display: none">
-		<div id="logo">
-			<h1>molecule</h1>
-			<h3 id="status">now booting...</h3>
-		</div>
-		<hr style="border-style: dashed" />
-
-		<div id="loading">
-			<div id="params">[ <x-tick>&nbsp;&nbsp;</x-tick> ] params</div>
-			<div id="widget">[ <x-tick>&nbsp;&nbsp;</x-tick> ] widget</div>
-			<div id="content">[ <x-tick>&nbsp;&nbsp;</x-tick> ] content</div>
-			<div id="client">[ <x-tick>&nbsp;&nbsp;</x-tick> ] client</div>
-			<div id="transport">[ <x-tick>&nbsp;&nbsp;</x-tick> ] transport</div>
-			<div id="room">[ <x-tick>&nbsp;&nbsp;</x-tick> ] room</div>
-			<div id="session">[ <x-tick>&nbsp;&nbsp;</x-tick> ] session</div>
-			<div id="keyProvider">[ <x-tick>&nbsp;&nbsp;</x-tick> ] key provider</div>
-			<div id="enter">[ <x-tick>&nbsp;&nbsp;</x-tick> ] enter</div>
-			<div id="sfuConfig">[ <x-tick>&nbsp;&nbsp;</x-tick> ] SFU config</div>
-			<div id="userMedia">[ <x-tick>&nbsp;&nbsp;</x-tick> ] userMedia</div>
-			<div id="connect">[ <x-tick>&nbsp;&nbsp;</x-tick> ] connect</div>
-		</div>
-
-		<div id="main" hidden="">
-			<div>
-				<button id="leave">Leave</button>
-				<button id="mic">Unmute</button>
-				<button id="cam">Start webcam</button>
-			</div>
-
-			<div>
-				<button id="screen">Share screen</button>
-				<button id="sysaud">Share system audio</button>
-			</div>
-			<br />
-			<div id="systemAudio" hidden="">
-				<button id="systemAudioAuto">Auto add</button>
-				<div id="systemAudioTargets"></div>
-			</div>
-		</div>
-		<br />
-		<div id="tracks"></div>
-	</body>
 </html>

@@ -1,2 +1,4 @@
 allowBuilds:
   core-js: true
+patchedDependencies:
+  element-call@0.0.0: patches/element-call@0.0.0.patch

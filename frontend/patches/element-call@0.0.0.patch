@@ -1,0 +1,26 @@
+diff --git a/src/utils/matrix.ts b/src/utils/matrix.ts
+index 4e3ae3c322dbd2f78d2c494aac166e8950e1ba4d..c31292bc936855d9c34e10f8d9c1ffe35e32f7ea 100644
+--- a/src/utils/matrix.ts
++++ b/src/utils/matrix.ts
+@@ -20,7 +20,7 @@ import { secureRandomBase64Url } from "matrix-js-sdk/lib/randomstring";
+ import { sleep } from "matrix-js-sdk/lib/utils";
+ 
+ import type { ICreateClientOpts, MatrixClient, Room } from "matrix-js-sdk";
+-import IndexedDBWorker from "../IndexedDBWorker?worker";
++import { IndexedDBStoreWorker } from "matrix-js-sdk/lib/indexeddb-worker";
+ import { generateUrlSearchParams, getUrlParams } from "../UrlParams";
+ import { Config } from "../config/Config";
+ import { E2eeType } from "../e2ee/e2eeType";
+@@ -101,7 +101,11 @@ export async function initClient(
+       // Chrome supports it. (It bundles them fine in production mode.)
+       workerFactory: import.meta.env.DEV
+         ? undefined
+-        : (): Worker => new IndexedDBWorker(),
++        : (): Worker => {
++            const worker = new IndexedDBStoreWorker((self as any).postMessage)
++            self.onmessage = worker.onMessage;
++            return worker;
++        }
+     });
+   } else if (localStorage) {
+     baseOpts.store = new MemoryStore({ localStorage });
