@@ -29,7 +29,6 @@ typedef struct {
 #include <err.h>
 #include <pthread.h>
 #include <strings.h>
-#include <unistd.h>
 
 #include <pipewire/pipewire.h>
 #include <spa/param/audio/format-utils.h>
@@ -373,7 +372,7 @@ void setLinkState(int nodeID, bool link) {
 
 int main(void) {
 	initAudioCapture();
-	getchar();
+	pause();
 }
 
 void Broadcast(char*, uint32_t len) {

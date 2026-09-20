@@ -5,10 +5,13 @@ improvements as *SYSTEM AUDIO SHARING*!!!
 [[file:showcase.png]]
 
 ** How it works
-Apart from the normal MatrixRTC + Livekit stuff, Molecule also connects
-to a daemon that records system audio from Pipewire.
-Very soon™, this daemon will provide audio source selection functionality
-similar to [[https://github.com/42LoCo42/gstalk][gstalk]] via a separate control protocol driven by the frontend.
+Apart from the normal MatrixRTC + Livekit stuff,
+Molecule also includes a daemon that enumerates Pipewire clients.
+The frontend allows you to select which of these applications to record.
+Their audio outputs will be bundled by the daemon into a single
+F32 PCM stream at 48kHz, which is passed to the frontend via a websocket.
+There, it's published as an additional audio track in the Livekit room
+corresponding to your currently joined call.
 
 ** Usage guide
 1. Have [[https://github.com/gomuks/gomuks][Gomuks Web]] running locally (on its standard port 29325)
@@ -17,6 +20,10 @@ similar to [[https://github.com/42LoCo42/gstalk][gstalk]] via a separate control
 4. Access Gomuks through [[http://localhost:5173]]
 5. Set your Element call base URL to that same address
 6. Place a call; you should see Molecule starting!
+
+Alternatively, if you don't want to develop the frontend,
+bundle it with =just dist=, then serve Molecule through Caddy
+on [[http://localhost:8080]] with =caddy run=.
 
 ** Why does Molecule need the same origin as Gomuks?
 [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements][This is why,]] and we need SharedArrayBuffer for low-latency audio transport.
