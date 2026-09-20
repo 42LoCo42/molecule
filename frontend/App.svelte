@@ -24,6 +24,8 @@
 
 	let status = $state("now booting...");
 	let molecule: undefined | Molecule = $state();
+	let micBtn: undefined | Button = $state();
+
 	onMount(async () => {
 		molecule = await boot((s) => {
 			status = s;
@@ -40,6 +42,10 @@
 	async function toggleAutoAdd() {
 		return (molecule!.systemAudio!.autoAdd = !molecule!.systemAudio!.autoAdd);
 	}
+
+	$effect(() => {
+		if (micBtn) micBtn.click();
+	});
 </script>
 
 <x-logo>
@@ -53,6 +59,7 @@
 		<div>
 			<Button on="&hairsp;󰩈" on-tt="Leave call" onclick={molecule.leave} />
 			<Button
+				bind:this={micBtn}
 				off=""
 				off-tt="Unmute"
 				on="&hairsp;"

@@ -26,9 +26,15 @@
 			enabled = result;
 		}
 	}
+
+	let button: HTMLButtonElement;
+	export function click() {
+		button.click();
+	}
 </script>
 
 <button
+	bind:this={button}
 	class:enabled
 	disabled={disabled !== undefined}
 	title={disabled ?? (enabled ? on_tt : off_tt)}
