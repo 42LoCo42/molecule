@@ -3,6 +3,6 @@
 .env
 ca.key
 compile_commands.json
-dist
+dist*
 node_modules
 result

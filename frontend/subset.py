@@ -7,10 +7,16 @@ from fontTools.ttLib import TTFont
 
 font = TTFont(argv[1])
 
+icons = list(
+    filter(
+        lambda x: x > 127,
+        map(ord, open(f"{dirname(argv[0])}/App.svelte", "r").read()),  #
+    )
+)
 REPL = 0xFFFD  # unicode replacement character "�"
 
 subsetter = Subsetter()
-subsetter.populate(unicodes=(list(range(32, 128)) + [REPL]))
+subsetter.populate(unicodes=(list(range(32, 128)) + icons + [REPL]))
 subsetter.subset(font)
 
 glyphs = font["glyf"].glyphs

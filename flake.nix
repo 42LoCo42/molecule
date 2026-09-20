@@ -3,6 +3,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
+        mkSrc = x: pkgs.lib.fileset.toSource { root = x; fileset = x; };
 
         pname = "molecule";
         version = "1.0.0";
@@ -22,8 +23,7 @@
           frontend = pkgs.stdenv.mkDerivation (drv: {
             pname = "molecule-frontend";
             inherit version;
-
-            src = ./frontend;
+            src = mkSrc ./frontend;
 
             nativeBuildInputs = with pkgs; [
               nodejs
@@ -50,8 +50,7 @@
           backend = pkgs.buildGoModule {
             pname = "${pname}-backend";
             inherit version;
-
-            src = ./backend;
+            src = mkSrc ./backend;
 
             inherit env;
 
@@ -86,7 +85,10 @@
           ];
 
           env = env // {
-            IOSEVKA = "${pkgs.iosevka}/share/fonts/truetype/Iosevka-Regular.ttf";
+            IOSEVKA = pkgs.lib.join "" [
+              "${pkgs.nerd-fonts.iosevka-term}/share/fonts/truetype/"
+              "NerdFonts/IosevkaTerm/IosevkaTermNerdFont-Regular.ttf"
+            ];
           };
         };
       });

@@ -1,12 +1,21 @@
 <script lang="ts">
 	interface Props {
 		on?: string;
+		"on-tt"?: string;
 		off?: string;
+		"off-tt"?: string;
 		onclick?: () => Promise<void | boolean>;
-		disabled?: string;
+		disabled?: undefined | string;
 	}
 
-	const { on, off = on, onclick, disabled }: Props = $props();
+	const {
+		on,
+		"on-tt": on_tt,
+		off = on,
+		"off-tt": off_tt = on_tt,
+		onclick,
+		disabled,
+	}: Props = $props();
 
 	let enabled = $state(false);
 	async function update() {
@@ -22,12 +31,15 @@
 <button
 	class:enabled
 	disabled={disabled !== undefined}
-	title={disabled}
-	onclick={update}>{enabled ? on : off}</button
+	title={disabled ?? (enabled ? on_tt : off_tt)}
+	onclick={update}>{enabled ? on : off}&emsp;</button
 >
 
 <style>
 	button {
+		text-align: center;
+		width: 2.4em;
+
 		background-color: inherit;
 
 		margin: 4px;
@@ -50,8 +62,8 @@
 		color: var(--yellow);
 		border-color: var(--yellow);
 
-		transform: translate(3px, 3px);
-		box-shadow: -3px -3px var(--gray);
+		transform: translate(2.5px, 2.5px);
+		box-shadow: -2.5px -2.5px var(--gray);
 
 		transition:
 			color 0.25s ease-out,
@@ -64,8 +76,8 @@
 		color: var(--green) !important;
 		border-color: var(--green) !important;
 
-		transform: translate(6px, 6px) !important;
-		box-shadow: -6px -6px var(--gray) !important;
+		transform: translate(5px, 5px) !important;
+		box-shadow: -5px -5px var(--gray) !important;
 	}
 
 	button.enabled:hover {

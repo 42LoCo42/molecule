@@ -51,33 +51,50 @@
 <main>
 	{#if molecule}
 		<div>
-			<Button on="Leave" onclick={molecule.leave} />
-			<Button off="Unmute" on="Mute" onclick={molecule.toggleMute} />
+			<Button on="&hairsp;󰩈" on-tt="Leave call" onclick={molecule.leave} />
 			<Button
-				off="Start webcam"
-				on="Stop webcam"
+				off=""
+				off-tt="Unmute"
+				on="&hairsp;"
+				on-tt="Mute"
+				onclick={molecule.toggleMute}
+			/>
+			<Button
+				off=""
+				off-tt="Share webcam"
+				on=""
+				on-tt="Stop sharing webcam"
 				onclick={molecule.toggleCam}
 			/>
-		</div>
-		<div>
 			<Button
-				off="Share screen"
-				on="Stop sharing screen"
+				off="󰶐"
+				off-tt="Share screen"
+				on="󰍹"
+				on-tt="Stop sharing screen"
 				onclick={molecule.toggleScreen}
 			/>
 			<Button
-				off="Share system audio"
-				on="Stop sharing system audio"
+				off="󰖁"
+				off-tt="Share system audio"
+				on="󰕾"
+				on-tt="Stop sharing system audio"
 				onclick={molecule.toggleSysAudio}
 				disabled={systemAudioError}
 			/>
+			{#if molecule.systemAudio}
+				<Button
+					off="󱧧"
+					off-tt="Enable auto-add"
+					on="󰁪"
+					on-tt="Disable auto-add"
+					onclick={toggleAutoAdd}
+				/><br />
+				{#each molecule.systemAudio.nodes as [_, node]}
+					<LocalNode {node} systemAudio={molecule.systemAudio} /><br />
+				{/each}
+			{/if}
 		</div>
-		{#if molecule.systemAudio}
-			<Button on="Auto add" onclick={toggleAutoAdd} /><br />
-			{#each molecule.systemAudio.nodes as [_, node]}
-				<LocalNode {node} systemAudio={molecule.systemAudio} /><br />
-			{/each}
-		{/if}
+
 		<br />
 		{#each molecule.tracks as [_, track]}
 			<Track {track} /><br />

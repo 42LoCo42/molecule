@@ -27,6 +27,11 @@ export class Molecule {
 	tracks = new SvelteMap<string, Track>();
 
 	leave = async () => {
+		this.participant.getTrackPublications().forEach((pub) => {
+			if (pub.track)
+				this.participant.unpublishTrack(pub.track.mediaStreamTrack);
+		});
+
 		const call = this.client.getGroupCallForRoom(this.roomId);
 		if (call !== null) await call.terminate();
 
