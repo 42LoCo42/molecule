@@ -90,6 +90,10 @@
               "NerdFonts/IosevkaTerm/IosevkaTermNerdFont-Regular.ttf"
             ];
           };
+
+          shellHook = ''
+            export GOPATH=$PWD/.cache/go
+          '';
         };
       });
 }

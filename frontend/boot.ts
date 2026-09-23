@@ -21,7 +21,7 @@ import {
 import E2EEWorker from "livekit-client/e2ee-worker?worker&inline";
 
 import { Molecule } from "./Molecule.svelte";
-import { Track } from "./Track";
+import { Peer } from "./Peer.svelte.ts";
 
 function getBootStage(name: string): HTMLSpanElement {
 	return document.querySelector(`#boot-${name} x-tick`) as HTMLSpanElement;
@@ -152,10 +152,9 @@ export async function boot(status: (value: string) => void) {
 			if (track.kind === LKTrack.Kind.Unknown)
 				throw up("track has unknown kind");
 
-			molecule.tracks.set(
-				track.mediaStreamID,
-				new Track(track.mediaStream, track.kind, participant.identity),
-			);
+			molecule.peers
+				.getOrInsert(participant.identity, new Peer())
+				.registerTrack(track);
 		}
 
 		lkRoom.remoteParticipants.forEach((participant) => {
@@ -170,7 +169,10 @@ export async function boot(status: (value: string) => void) {
 
 		lkRoom.on(RoomEvent.TrackUnsubscribed, (track) => {
 			console.log("TrackUnsubscribed", track);
-			molecule.tracks.delete(track.mediaStreamID);
+
+			molecule.peers.forEach((p, i) => {
+				if (p.unregisterTrack(track)) molecule.peers.delete(i);
+			});
 		});
 
 		return molecule;

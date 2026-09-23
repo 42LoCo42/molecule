@@ -6,13 +6,12 @@ import type { WidgetHelpers } from "element-call/src/widget";
 
 import {
 	AudioPresets,
-	Track as LKTrack,
 	type LocalParticipant,
 	LocalTrack,
 } from "livekit-client";
 
+import type { Peer } from "./Peer.svelte.ts";
 import { type SystemAudio, getSystemAudio } from "./SystemAudio.svelte";
-import { Track } from "./Track";
 
 export class Molecule {
 	constructor(
@@ -28,7 +27,7 @@ export class Molecule {
 	screenTrack: undefined | LocalTrack;
 	systemAudio: undefined | SystemAudio = $state();
 
-	tracks = new SvelteMap<string, Track>();
+	peers = new SvelteMap<string, Peer>();
 
 	leave = async () => {
 		this.participant.getTrackPublications().forEach((pub) => {

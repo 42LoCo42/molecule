@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Button from "./Button.svelte";
 	import LocalNode from "./LocalNode.svelte";
-	import Track from "./Track.svelte";
+	import Peer from "./Peer.svelte";
 	import { Molecule } from "./Molecule.svelte";
 	import { boot } from "./boot";
 	import { onMount } from "svelte";
@@ -101,10 +101,9 @@
 				{/each}
 			{/if}
 		</div>
-
 		<br />
-		{#each molecule.tracks as [_, track]}
-			<Track {track} /><br />
+		{#each molecule.peers as [name, peer]}
+			<Peer {name} {peer} /><br />
 		{/each}
 	{:else}
 		{#each bootStages as stage}
