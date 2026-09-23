@@ -11,7 +11,13 @@ import { getSFUConfigWithOpenID } from "element-call/src/livekit/openIDSFU";
 import { enterRTCSession } from "element-call/src/state/CallViewModel/localMember/LocalMember";
 import { initializeWidget } from "element-call/src/widget";
 
-import { Track as LKTrack, Room, RoomEvent } from "livekit-client";
+import {
+	Track as LKTrack,
+	Participant,
+	RemoteTrack,
+	Room,
+	RoomEvent,
+} from "livekit-client";
 import E2EEWorker from "livekit-client/e2ee-worker?worker&inline";
 
 import { Molecule } from "./Molecule.svelte";
@@ -137,7 +143,9 @@ export async function boot(status: (value: string) => void) {
 			lkRoom.localParticipant,
 		);
 
-		lkRoom.on(RoomEvent.TrackSubscribed, (track, _, participant) => {
+		function registerTrack(track: RemoteTrack, participant: Participant) {
+			console.log("TrackSubscribed", track, participant.identity);
+
 			if (track.mediaStream === undefined)
 				throw up("track has no media stream");
 
@@ -148,9 +156,20 @@ export async function boot(status: (value: string) => void) {
 				track.mediaStreamID,
 				new Track(track.mediaStream, track.kind, participant.identity),
 			);
+		}
+
+		lkRoom.remoteParticipants.forEach((participant) => {
+			participant.trackPublications.forEach((pub) => {
+				if (pub.track) registerTrack(pub.track, participant);
+			});
+		});
+
+		lkRoom.on(RoomEvent.TrackSubscribed, (track, _, participant) => {
+			registerTrack(track, participant);
 		});
 
 		lkRoom.on(RoomEvent.TrackUnsubscribed, (track) => {
+			console.log("TrackUnsubscribed", track);
 			molecule.tracks.delete(track.mediaStreamID);
 		});
 
