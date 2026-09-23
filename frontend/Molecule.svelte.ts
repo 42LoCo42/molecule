@@ -8,6 +8,7 @@ import {
 	AudioPresets,
 	Track as LKTrack,
 	type LocalParticipant,
+	LocalTrack,
 } from "livekit-client";
 
 import { type SystemAudio, getSystemAudio } from "./SystemAudio.svelte";
@@ -22,6 +23,9 @@ export class Molecule {
 		public participant: LocalParticipant,
 	) {}
 
+	micTrack: undefined | LocalTrack;
+	camTrack: undefined | LocalTrack;
+	screenTrack: undefined | LocalTrack;
 	systemAudio: undefined | SystemAudio = $state();
 
 	tracks = new SvelteMap<string, Track>();
@@ -41,50 +45,50 @@ export class Molecule {
 	};
 
 	toggleMute = async () => {
-		const active = !this.participant.isMicrophoneEnabled;
-		if (active) {
-			await this.participant.setMicrophoneEnabled(active, undefined, {
-				forceStereo: true,
-				audioPreset: AudioPresets.musicHighQualityStereo,
-			});
+		if (this.micTrack !== undefined) {
+			this.participant.unpublishTrack(this.micTrack, true);
+			this.micTrack = undefined;
 		} else {
-			const track = this.participant.getTrackPublication(
-				LKTrack.Source.Microphone,
+			this.micTrack = (
+				await this.participant.setMicrophoneEnabled(true, undefined, {
+					forceStereo: true,
+					audioPreset: AudioPresets.musicHighQualityStereo,
+				})
 			)?.track;
-			if (track) this.participant.unpublishTrack(track);
 		}
-
-		return active;
+		return this.micTrack !== undefined;
 	};
 
 	toggleCam = async () => {
-		const active = !this.participant.isCameraEnabled;
-		if (active) {
-			await this.participant.setCameraEnabled(active);
+		if (this.camTrack !== undefined) {
+			this.participant.unpublishTrack(this.camTrack, true);
+			this.camTrack = undefined;
 		} else {
-			const track = this.participant.getTrackPublication(
-				LKTrack.Source.Camera,
-			)?.track;
-			if (track) this.participant.unpublishTrack(track);
+			this.camTrack = (await this.participant.setCameraEnabled(true))?.track;
 		}
-		return active;
+		return this.camTrack !== undefined;
 	};
 
 	toggleScreen = async () => {
-		const active = !this.participant.isScreenShareEnabled;
-		await this.participant.setScreenShareEnabled(active);
-		return active;
+		if (this.screenTrack !== undefined) {
+			this.participant.unpublishTrack(this.screenTrack, true);
+			this.screenTrack = undefined;
+		} else {
+			this.screenTrack = (await this.participant.setScreenShareEnabled(true))
+				?.track;
+		}
+		return this.screenTrack !== undefined;
 	};
 
 	toggleSysAudio = async () => {
-		if (this.systemAudio === undefined) {
-			this.systemAudio = await getSystemAudio(this.participant);
-		} else {
+		if (this.systemAudio !== undefined) {
 			await this.participant.unpublishTrack(this.systemAudio.publication);
 
 			this.systemAudio.audioSocket.close();
 			this.systemAudio.controlSocket.close();
 			this.systemAudio = undefined;
+		} else {
+			this.systemAudio = await getSystemAudio(this.participant);
 		}
 
 		return this.systemAudio !== undefined;
