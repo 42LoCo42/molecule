@@ -1,10 +1,22 @@
+import { hash as h64 } from "@intrnl/xxhash64";
+import { SvelteMap } from "svelte/reactivity";
+
 import { type RemoteTrack, Track } from "livekit-client";
+
+const colors = new SvelteMap<string, string>();
 
 export class Peer {
 	micTrack: undefined | RemoteTrack = $state();
 	camTrack: undefined | RemoteTrack = $state();
 	screenTrack: undefined | RemoteTrack = $state();
 	sysaudTrack: undefined | RemoteTrack = $state();
+
+	public getColor(name: string): string {
+		return colors.getOrInsertComputed(
+			name,
+			(x) => `hsl(${h64(x) % 360n}, 100%, 60%)`,
+		);
+	}
 
 	public registerTrack(track: RemoteTrack) {
 		if (track.source === Track.Source.Unknown)

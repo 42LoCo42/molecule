@@ -11,6 +11,9 @@ importers:
 
   .:
     devDependencies:
+      '@intrnl/xxhash64':
+        specifier: ^0.1.2
+        version: 0.1.2
       '@livekit/components-core':
         specifier: ^0.12.15
         version: 0.12.15(livekit-client@2.22.3(@types/dom-mediacapture-record@1.0.22))(tslib@2.8.1)
@@ -159,6 +162,9 @@ packages:
 
   '@fontsource/inter@5.3.0':
     resolution: {integrity: sha512-RofMylZmjlJEfELXeNHFWBRcSs75rGU/6bV2S2jfnvv/3rPXPGe0LgUJTklcHZ9lM4OZmAVFhcJPnACfb91A3g==}
+
+  '@intrnl/xxhash64@0.1.2':
+    resolution: {integrity: sha512-1+lx7j99fdph+uy3EnjQyr39KQZ7LP56+aWOr6finJWpgYpvb7XrhFUqDwnEk/wpPC98nCjAT6RulpW3crWjlg==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -1440,6 +1446,8 @@ snapshots:
   '@fontsource/inconsolata@5.3.0': {}
 
   '@fontsource/inter@5.3.0': {}
+
+  '@intrnl/xxhash64@0.1.2': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:

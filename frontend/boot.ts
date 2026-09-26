@@ -152,9 +152,8 @@ export async function boot(status: (value: string) => void) {
 			if (track.kind === LKTrack.Kind.Unknown)
 				throw up("track has unknown kind");
 
-			molecule.peers
-				.getOrInsert(participant.identity, new Peer())
-				.registerTrack(track);
+			const name = participant.identity.match(/[^:]+:[^:]+/)![0];
+			molecule.peers.getOrInsert(name, new Peer()).registerTrack(track);
 		}
 
 		lkRoom.remoteParticipants.forEach((participant) => {
