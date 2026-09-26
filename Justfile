@@ -32,3 +32,16 @@ backend-test:
 		$(pkg-config --cflags --libs libpipewire-0.3) \
 		backend/pipewire.c -o "$tmp/molecule"
 	"$tmp/molecule"
+
+# launch development environment in tmux
+dev:
+	#!/usr/bin/env bash
+	orig="$TMUX_PANE"
+	tmux                                            \
+		neww       'direnv exec . just frontend' \; \
+		splitw  -h 'direnv exec . just backend'  \; \
+		splitw  -v                               \; \
+		selectp -L                               \; \
+		splitw  -v 'direnv exec . caddy run'     \; \
+		selectp -R                               \; \
+		killp   -t "$orig"

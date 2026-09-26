@@ -1,21 +1,33 @@
 <script lang="ts">
 	import type { RemoteTrack } from "livekit-client";
-	import { onMount } from "svelte";
 
-	const { kind, track }: { kind: "audio" | "video"; track: RemoteTrack } =
+	const {
+		audio,
+		video,
+	}: { audio: undefined | RemoteTrack; video: undefined | RemoteTrack } =
 		$props();
 
-	let mediaElement: undefined | HTMLMediaElement = $state();
-	onMount(() => {
-		if (track.mediaStream === undefined)
-			throw new Error(`track has no mediaStream: ${track} `);
+	let muted = $state(false);
+	let volume = $state(1);
 
-		mediaElement!.srcObject = track.mediaStream;
+	let audioElement: undefined | HTMLMediaElement = $state();
+	let videoElement: undefined | HTMLMediaElement = $state();
+
+	$effect(() => {
+		if (audio?.mediaStream) audioElement!.srcObject = audio.mediaStream;
+	});
+
+	$effect(() => {
+		if (video?.mediaStream) videoElement!.srcObject = video.mediaStream;
 	});
 </script>
 
-{#if kind === "audio"}
-	<audio bind:this={mediaElement} autoplay controls></audio>
-{:else}
-	<video bind:this={mediaElement} autoplay controls></video>
+{#if audio}
+	<audio bind:this={audioElement} bind:muted bind:volume autoplay controls
+	></audio>
+{/if}
+
+{#if video}
+	<video bind:this={videoElement} bind:muted bind:volume autoplay controls
+	></video>
 {/if}
