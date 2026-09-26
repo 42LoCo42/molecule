@@ -10,7 +10,8 @@
 		url("iosevka.ttf") format("truetype");
 }
 
-:root {
+:root,
+body {
 	--white: #ebdbb2;
 	--black: #282828;
 	--gray: #404040;

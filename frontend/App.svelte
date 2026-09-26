@@ -46,6 +46,16 @@
 	$effect(() => {
 		if (micBtn) micBtn.click();
 	});
+
+	document.onkeydown = (event) => {
+		if (event.key === "f") {
+			if (document.fullscreenElement) {
+				document.exitFullscreen();
+			} else {
+				document.body.requestFullscreen();
+			}
+		}
+	};
 </script>
 
 <x-logo>
