@@ -23,8 +23,6 @@
       in
       rec {
         packages = rec {
-          default = pkgs.linkFarmFromDrvs pname [ frontend backend ];
-
           frontend = pkgs.stdenv.mkDerivation (drv: {
             pname = "molecule-frontend";
             inherit version;
@@ -67,9 +65,16 @@
               pipewire
             ];
 
-            ldflags = [ "-s" ];
+            preBuild = ''
+              cp -r ${frontend} dist
+            '';
+
+            tags = [ "release" ];
+            ldflags = [ "-s" "-X main.version=${version}" ];
             vendorHash = "sha256-0Qxw+MUYVgzgWB8vi3HBYtVXSq/btfh4ZfV/m1chNrA=";
           };
+
+          default = backend;
         };
 
         devShells.default = pkgs.mkShell {

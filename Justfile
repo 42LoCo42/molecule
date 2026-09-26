@@ -37,11 +37,8 @@ backend-test:
 dev:
 	#!/usr/bin/env bash
 	orig="$TMUX_PANE"
-	tmux                                            \
-		neww       'direnv exec . just frontend' \; \
-		splitw  -h 'direnv exec . just backend'  \; \
-		splitw  -v                               \; \
-		selectp -L                               \; \
-		splitw  -v 'direnv exec . caddy run'     \; \
-		selectp -R                               \; \
-		killp   -t "$orig"
+	tmux                                           \
+		neww      'direnv exec . just frontend' \; \
+		splitw -h 'direnv exec . just backend'  \; \
+		neww                                    \; \
+		killp  -t "$orig"
