@@ -4,9 +4,14 @@
       let
         pkgs = import nixpkgs { inherit system; };
         mkSrc = x: pkgs.lib.fileset.toSource { root = x; fileset = x; };
+        inherit (pkgs.lib) fromJSON pipe readFile;
 
         pname = "molecule";
-        version = "1.0.0";
+        version = pipe ./frontend/package.json [
+          readFile
+          fromJSON
+          (x: x.version)
+        ];
 
         env = {
           CGO_CFLAGS_ALLOW = "-fno-strict-overflow";
@@ -35,7 +40,7 @@
               inherit (drv) pname src version;
               inherit (pkgs) pnpm;
               fetcherVersion = 4;
-              hash = "sha256-0d8DqWw7Jf2okZ2wQB48Ek1thbK5Og5O1bNhtZflqi0=";
+              hash = "sha256-wm3lonptNnKAPKTRV9VQVNo+u+c0QUJ71cHAPR1BiVA=";
             };
 
             buildPhase = ''

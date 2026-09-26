@@ -4,8 +4,10 @@
 	import Peer from "./Peer.svelte";
 	import { Molecule } from "./Molecule.svelte";
 	import { boot } from "./boot";
-	import { onMount } from "svelte";
 	import { testSystemAudioDaemon } from "./SystemAudio.svelte";
+	import { version } from "./package.json";
+
+	import { onMount } from "svelte";
 
 	const bootStages = [
 		"userMedia",
@@ -59,7 +61,7 @@
 </script>
 
 <x-logo>
-	<h1>molecule</h1>
+	<h1>molecule<sup>v{version}</sup></h1>
 	<h3>{status}</h3>
 </x-logo>
 <hr />
@@ -135,6 +137,14 @@
 		display: inline-block;
 		padding: 32px;
 		background: url("estradiol.svg") no-repeat;
+	}
+
+	sup {
+		font-size: 14px;
+		color: var(--lgray);
+		vertical-align: top;
+		position: relative;
+		top: 0.5em;
 	}
 
 	hr {
