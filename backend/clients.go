@@ -18,7 +18,7 @@ var (
 
 func NewClients() Clients {
 	return Clients{
-		Queue:   make(chan []byte, 256),
+		Queue:   make(chan []byte),
 		Entries: map[*Client]any{},
 	}
 }

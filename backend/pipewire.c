@@ -372,11 +372,19 @@ void setLinkState(int nodeID, bool link) {
 
 int main(void) {
 	initAudioCapture();
+	setAudioCaptureState(true);
+	setLinkState(85, true);
 	pause();
 }
 
 void Broadcast(char*, uint32_t len) {
-	log("got data %u", len);
+	static struct timespec old = {0};
+	struct timespec new        = {0};
+	clock_gettime(CLOCK_REALTIME, &new);
+	double delta = (new.tv_sec * 1000.0 + new.tv_nsec / 1000.0 / 1000.0) -
+	               (old.tv_sec * 1000.0 + old.tv_nsec / 1000.0 / 1000.0);
+	old = new;
+	log("got data %u took %f ms", len, delta);
 }
 
 void Targets(PWNode* targets, size_t length) {
