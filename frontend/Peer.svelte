@@ -10,8 +10,12 @@
 
 <fieldset style:border-color={color}>
 	<legend>{name}</legend>
-	<Player audio={peer.micTrack} video={peer.camTrack} />
-	<Player audio={peer.sysaudTrack} video={peer.screenTrack} />
+	<Player store="{name}/mic" audio={peer.micTrack} video={peer.camTrack} />
+	<Player
+		store="{name}/sysaud"
+		audio={peer.sysaudTrack}
+		video={peer.screenTrack}
+	/>
 </fieldset>
 
 <style>

@@ -2,13 +2,20 @@
 	import type { RemoteTrack } from "livekit-client";
 
 	const {
+		store,
 		audio,
 		video,
-	}: { audio: undefined | RemoteTrack; video: undefined | RemoteTrack } =
-		$props();
+	}: {
+		store: string;
+		audio: undefined | RemoteTrack;
+		video: undefined | RemoteTrack;
+	} = $props();
 
 	let muted = $state(false);
-	let volume = $state(1);
+
+	// svelte-ignore state_referenced_locally
+	const volkey = `molecule/audio/${store}`;
+	let volume = $state(parseFloat(window.localStorage.getItem(volkey) || "1"));
 
 	let audioElement: undefined | HTMLMediaElement = $state();
 	let videoElement: undefined | HTMLMediaElement = $state();
@@ -19,6 +26,10 @@
 
 	$effect(() => {
 		if (video?.mediaStream) videoElement!.srcObject = video.mediaStream;
+	});
+
+	$effect(() => {
+		window.localStorage.setItem(volkey, volume.toString());
 	});
 </script>
 
