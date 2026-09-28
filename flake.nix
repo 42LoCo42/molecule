@@ -102,6 +102,7 @@
           };
 
           shellHook = ''
+            export GOCACHE=$PWD/.cache/go-cache
             export GOPATH=$PWD/.cache/go
           '';
         };

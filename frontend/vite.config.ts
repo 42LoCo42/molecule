@@ -1,5 +1,5 @@
 import { svelte } from "@sveltejs/vite-plugin-svelte";
-import { defineConfig, searchForWorkspaceRoot } from "vite";
+import { defineConfig } from "vite";
 import generateFile from "vite-plugin-generate-file";
 
 const isolationHeaders = {
@@ -49,6 +49,12 @@ export default defineConfig({
 
 	server: {
 		proxy: {
+			"^/molecule": {
+				target: "http://localhost:37812",
+				changeOrigin: true,
+				ws: true,
+			},
+
 			"^/(?!room)": {
 				target: "http://localhost:29325",
 				changeOrigin: true,

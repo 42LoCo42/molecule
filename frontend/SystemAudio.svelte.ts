@@ -9,7 +9,7 @@ import {
 
 import processor from "./processor.js?url";
 
-const baseURL = "ws://localhost:37812";
+const baseURL = `ws://${document.location.host}/molecule`;
 const audioURL = `${baseURL}/audio`;
 const controlURL = `${baseURL}/control`;
 

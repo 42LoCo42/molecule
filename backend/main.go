@@ -13,9 +13,9 @@ import (
 )
 
 const usage = `molecule: usage:
-  -g, --gomuks: What address to contact gomuks on?
-  -l, --listen: What address to listen on?
-     --version: Print version and exit.
+  -g, --gomuks:  What address to contact gomuks on?
+  -l, --listen:  What address to listen on?
+      --version: Print version and exit.
 `
 
 var version = "dev"
@@ -60,7 +60,7 @@ func main() {
 
 	frontend := http.StripPrefix("/room", http.FileServer(http.FS(Frontend())))
 
-	http.HandleFunc("/audio", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/molecule/audio", func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Printf("websocket upgrade failed: %v", err)
@@ -77,7 +77,7 @@ func main() {
 		SetAudioCaptureState(true)
 	})
 
-	http.HandleFunc("/control", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/molecule/control", func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Printf("websocket upgrade failed: %v", err)
