@@ -44,7 +44,7 @@
 <style>
 	button {
 		text-align: center;
-		width: 2.4em;
+		width: 100%;
 
 		background-color: inherit;
 

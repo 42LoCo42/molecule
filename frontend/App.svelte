@@ -1,13 +1,10 @@
 <script lang="ts">
-	import Button from "./Button.svelte";
+	import ButtonList from "./ButtonList.svelte";
 	import LocalNode from "./LocalNode.svelte";
 	import Peer from "./Peer.svelte";
 	import { Molecule } from "./Molecule.svelte";
 	import { boot } from "./boot";
-	import { testSystemAudioDaemon } from "./SystemAudio.svelte";
 	import { version } from "./package.json";
-
-	import { onMount } from "svelte";
 
 	const bootStages = [
 		"userMedia",
@@ -25,28 +22,13 @@
 	];
 
 	let status = $state("now booting...");
-	let molecule: undefined | Molecule = $state();
-	let micBtn: undefined | Button = $state();
 
-	onMount(async () => {
-		molecule = await boot((s) => {
-			status = s;
-		});
-	});
-
-	const systemAudioError =
-		typeof SharedArrayBuffer === "undefined"
-			? "SharedArrayBuffer is undefined, check your URLs!"
-			: !(await testSystemAudioDaemon())
-				? "Can't connect to molecule daemon!"
-				: undefined;
-
-	async function toggleAutoAdd() {
-		return (molecule!.systemAudio!.autoAdd = !molecule!.systemAudio!.autoAdd);
-	}
-
-	$effect(() => {
-		if (micBtn) micBtn.click();
+	const molecule = new Promise<Molecule>(async (resolve) => {
+		resolve(
+			await boot((s) => {
+				status = s;
+			}),
+		);
 	});
 
 	document.onkeydown = (event) => {
@@ -67,61 +49,23 @@
 <hr />
 
 <main>
-	{#if molecule}
-		<div>
-			<Button on="&hairsp;󰩈" on-tt="Leave call" onclick={molecule.leave} />
-			<Button
-				bind:this={micBtn}
-				off=""
-				off-tt="Unmute"
-				on="&hairsp;"
-				on-tt="Mute"
-				onclick={molecule.toggleMute}
-			/>
-			<Button
-				off=""
-				off-tt="Share webcam"
-				on=""
-				on-tt="Stop sharing webcam"
-				onclick={molecule.toggleCam}
-			/>
-			<Button
-				off="󰶐"
-				off-tt="Share screen"
-				on="󰍹"
-				on-tt="Stop sharing screen"
-				onclick={molecule.toggleScreen}
-			/>
-			<Button
-				off="󰖁"
-				off-tt="Share system audio"
-				on="󰕾"
-				on-tt="Stop sharing system audio"
-				onclick={molecule.toggleSysAudio}
-				disabled={systemAudioError}
-			/>
-			{#if molecule.systemAudio}
-				<Button
-					off="󱧧"
-					off-tt="Enable auto-add"
-					on="󰁪"
-					on-tt="Disable auto-add"
-					onclick={toggleAutoAdd}
-				/><br />
-				{#each molecule.systemAudio.nodes as [_, node]}
-					<LocalNode {node} systemAudio={molecule.systemAudio} /><br />
-				{/each}
-			{/if}
-		</div>
+	{#await molecule}
+		{#each bootStages as stage}
+			<div id="boot-{stage}">[ <x-tick>&nbsp;&nbsp;</x-tick> ] {stage}</div>
+		{/each}
+	{:then molecule}
+		<ButtonList {molecule} />
+		{#if molecule.systemAudio}
+			<br />
+			{#each molecule.systemAudio.nodes as [_, node]}
+				<LocalNode {node} systemAudio={molecule.systemAudio} /><br />
+			{/each}
+		{/if}
 		<br />
 		{#each molecule.peers as [name, peer]}
 			<Peer {name} {peer} /><br />
 		{/each}
-	{:else}
-		{#each bootStages as stage}
-			<div id="boot-{stage}">[ <x-tick>&nbsp;&nbsp;</x-tick> ] {stage}</div>
-		{/each}
-	{/if}
+	{/await}
 </main>
 
 <style>

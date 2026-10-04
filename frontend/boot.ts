@@ -1,4 +1,5 @@
 import { isLivekitTransportConfig } from "matrix-js-sdk/lib/matrixrtc";
+import { sleep } from "matrix-js-sdk/lib/utils";
 import { v4 as uuidv4 } from "uuid";
 
 import { getUrlParams } from "element-call/src/UrlParams";
@@ -12,19 +13,19 @@ import { enterRTCSession } from "element-call/src/state/CallViewModel/localMembe
 import { initializeWidget } from "element-call/src/widget";
 
 import {
-	Track as LKTrack,
 	Participant,
 	RemoteTrack,
 	Room,
 	RoomEvent,
+	Track,
 } from "livekit-client";
 import E2EEWorker from "livekit-client/e2ee-worker?worker&inline";
 
 import { Molecule } from "./Molecule.svelte";
 import { Peer } from "./Peer.svelte.ts";
 
-function getBootStage(name: string): HTMLSpanElement {
-	return document.querySelector(`#boot-${name} x-tick`) as HTMLSpanElement;
+function getBootStage(name: string): HTMLElement | null {
+	return document.querySelector(`#boot-${name} x-tick`);
 }
 
 export async function boot(status: (value: string) => void) {
@@ -42,6 +43,7 @@ export async function boot(status: (value: string) => void) {
 	try {
 		const up = (msg: string) => new Error(`molecule: ${msg}`);
 
+		await start(""); // dummy delay
 		await start("userMedia");
 		await navigator.mediaDevices.getUserMedia({ audio: true });
 
@@ -129,10 +131,6 @@ export async function boot(status: (value: string) => void) {
 		await start("connect");
 		await lkRoom.setE2EEEnabled(true);
 		await lkRoom.connect(lkCreds.url, lkCreds.jwt);
-
-		await start("done");
-		status("connected!");
-
 		await client.sendEmoteMessage(roomId, "is calling");
 
 		const molecule = new Molecule(
@@ -149,8 +147,7 @@ export async function boot(status: (value: string) => void) {
 			if (track.mediaStream === undefined)
 				throw up("track has no media stream");
 
-			if (track.kind === LKTrack.Kind.Unknown)
-				throw up("track has unknown kind");
+			if (track.kind === Track.Kind.Unknown) throw up("track has unknown kind");
 
 			const name = participant.identity.match(/[^:]+:[^:]+/)![0];
 			molecule.peers.getOrInsert(name, new Peer()).registerTrack(track);
@@ -173,6 +170,10 @@ export async function boot(status: (value: string) => void) {
 				if (p.unregisterTrack(track)) molecule.peers.delete(i);
 			});
 		});
+
+		await start(""); // dummy so last stage gets checked
+		status("connected!");
+		await sleep(100);
 
 		return molecule;
 	} catch (e) {

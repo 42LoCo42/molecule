@@ -8,6 +8,7 @@ import {
 	AudioPresets,
 	type LocalParticipant,
 	LocalTrack,
+	VideoPresets,
 } from "livekit-client";
 
 import type { Peer } from "./Peer.svelte.ts";
@@ -63,7 +64,11 @@ export class Molecule {
 			this.participant.unpublishTrack(this.camTrack, true);
 			this.camTrack = undefined;
 		} else {
-			this.camTrack = (await this.participant.setCameraEnabled(true))?.track;
+			this.camTrack = (
+				await this.participant.setCameraEnabled(true, {
+					resolution: VideoPresets.h1080,
+				})
+			)?.track;
 		}
 		return this.camTrack !== undefined;
 	};
