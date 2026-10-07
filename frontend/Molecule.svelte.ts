@@ -24,7 +24,7 @@ export class Molecule {
 	) {}
 
 	micTrack: undefined | LocalTrack;
-	camTrack: undefined | LocalTrack;
+	camTrack: undefined | LocalTrack = $state();
 	screenTrack: undefined | LocalTrack;
 	systemAudio: undefined | SystemAudio = $state();
 

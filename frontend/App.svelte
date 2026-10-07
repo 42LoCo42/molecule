@@ -3,8 +3,11 @@
 	import LocalNode from "./LocalNode.svelte";
 	import Peer from "./Peer.svelte";
 	import { Molecule } from "./Molecule.svelte";
+	import { Peer as PeerObj } from "./Peer.svelte.ts";
 	import { boot } from "./boot";
 	import { version } from "./package.json";
+
+	import type { Track } from "livekit-client";
 
 	const bootStages = [
 		"userMedia",
@@ -30,6 +33,12 @@
 			}),
 		);
 	});
+
+	function mirror(camTrack: Track): PeerObj {
+		const peer = new PeerObj();
+		peer.registerTrack(camTrack);
+		return peer;
+	}
 
 	document.onkeydown = (event) => {
 		if (event.key === "f") {
@@ -62,6 +71,12 @@
 			{/each}
 		{/if}
 		<br />
+		{#if molecule.camTrack}
+			<Peer
+				name={molecule.client.getUserId()!}
+				peer={mirror(molecule.camTrack)}
+			/>
+		{/if}
 		{#each molecule.peers as [name, peer]}
 			<Peer {name} {peer} /><br />
 		{/each}

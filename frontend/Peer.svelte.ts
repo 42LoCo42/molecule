@@ -1,15 +1,15 @@
 import { hash as h64 } from "@intrnl/xxhash64";
 import { SvelteMap } from "svelte/reactivity";
 
-import { type RemoteTrack, Track } from "livekit-client";
+import { Track } from "livekit-client";
 
 const colors = new SvelteMap<string, string>();
 
 export class Peer {
-	micTrack: undefined | RemoteTrack = $state();
-	camTrack: undefined | RemoteTrack = $state();
-	screenTrack: undefined | RemoteTrack = $state();
-	sysaudTrack: undefined | RemoteTrack = $state();
+	micTrack: undefined | Track = $state();
+	camTrack: undefined | Track = $state();
+	screenTrack: undefined | Track = $state();
+	sysaudTrack: undefined | Track = $state();
 
 	public getColor(name: string): string {
 		return colors.getOrInsertComputed(
@@ -18,7 +18,7 @@ export class Peer {
 		);
 	}
 
-	public registerTrack(track: RemoteTrack) {
+	public registerTrack(track: Track) {
 		if (track.source === Track.Source.Unknown)
 			throw new Error(`track has unknown source: ${track}`);
 
@@ -41,7 +41,7 @@ export class Peer {
 		}
 	}
 
-	public unregisterTrack(track: RemoteTrack) {
+	public unregisterTrack(track: Track) {
 		if (track.source === Track.Source.Unknown)
 			throw new Error(`track has unknown source: ${track}`);
 

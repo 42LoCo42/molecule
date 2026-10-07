@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { RemoteTrack } from "livekit-client";
+	import type { Track } from "livekit-client";
 
 	const {
 		store,
@@ -7,8 +7,8 @@
 		video,
 	}: {
 		store: string;
-		audio: undefined | RemoteTrack;
-		video: undefined | RemoteTrack;
+		audio: undefined | Track;
+		video: undefined | Track;
 	} = $props();
 
 	let muted = $state(false);
