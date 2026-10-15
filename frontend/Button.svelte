@@ -1,5 +1,6 @@
 <script lang="ts">
 	interface Props {
+		key: undefined | string;
 		on?: string;
 		"on-tt"?: string;
 		off?: string;
@@ -9,6 +10,7 @@
 	}
 
 	const {
+		key = undefined,
 		on,
 		"on-tt": on_tt,
 		off = on,
@@ -30,6 +32,22 @@
 	let button: HTMLButtonElement;
 	export function click() {
 		button.click();
+	}
+
+	// svelte-ignore state_referenced_locally
+	if (key) {
+		document.addEventListener("keydown", (event) => {
+			const cur = [
+				event.altKey ? "A-" : "",
+				event.ctrlKey ? "C-" : "",
+				event.shiftKey ? "S-" : "",
+				event.key,
+			].join("");
+			if (cur === key) {
+				event.preventDefault();
+				click();
+			}
+		});
 	}
 </script>
 

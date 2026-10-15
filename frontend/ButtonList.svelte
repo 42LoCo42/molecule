@@ -28,6 +28,7 @@
 <div>
 	<Button on="&hairsp;󰩈" on-tt="Leave call" onclick={molecule.leave} />
 	<Button
+		key="C-m"
 		bind:this={micBtn}
 		off=""
 		off-tt="Unmute"
@@ -36,6 +37,7 @@
 		onclick={molecule.toggleMute}
 	/>
 	<Button
+		key="C-c"
 		off=""
 		off-tt="Share webcam"
 		on=""
@@ -43,6 +45,7 @@
 		onclick={molecule.toggleCam}
 	/>
 	<Button
+		key="C-s"
 		off="󰶐"
 		off-tt="Share screen"
 		on="󰍹"
@@ -51,6 +54,7 @@
 	/>
 	{#await systemAudioError then err}
 		<Button
+			key="C-a"
 			off="󰖁"
 			off-tt="Share system audio"
 			on="󰕾"
@@ -61,6 +65,7 @@
 	{/await}
 	{#if molecule.systemAudio}
 		<Button
+			key="A-C-a"
 			off="󱧧"
 			off-tt="Enable auto-add"
 			on="󰁪"
