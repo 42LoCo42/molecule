@@ -27,7 +27,7 @@ func main() {
 
 	var listenAddr string
 	flag.StringVar(&listenAddr, "l", "", "")
-	flag.StringVar(&listenAddr, "listen", ":37812", "")
+	flag.StringVar(&listenAddr, "listen", ":29326", "")
 
 	var printVersion bool
 	flag.BoolVar(&printVersion, "version", false, "")
